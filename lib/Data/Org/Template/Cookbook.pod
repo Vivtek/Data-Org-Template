@@ -22,19 +22,66 @@ input data you can greet anybody you like.
 
     use Data::Org::Template;
 
-    my $t = Data::Org::Template->new ("Hello, [[world]]!");
-    
+    my $t = Data::Org::Template->new ("Hello, [[name]]!");
     print $t->text({name => 'world'});
 
 So far, this is no different from any other template engine - we have a field delimited by some kind of special brackets, and the field names a data item in a hashref.
 This is just how you set it all up.
 
- Other things to put in a cookbook:
- - Multiline templates (<<'EOF' syntax)
- - Parsing on different brackets
- - Setting the getter for the template
- - Defining different types of getter, including multi-source getters 
+=head2 Multiline templates
 
+What I normally do for multiline templates (which is the majority of templates) is this:
+
+    use Data::Org::Template;
+
+    my $t = Data::Org::Template->new (<<'EOF');
+    Hello to:
+    [[name]]
+    EOF
+    
+    print $t->text({name => 'world'});
+
+=head2 I don't like those [[brackets]]
+
+You can also easily use a different type of bracket.
+
+    use Data::Org::Template;
+
+    my $t = Data::Org::Template->new ("Hello, {name}!", '{}');
+    print $t->text({name => 'world'});
+
+=head1 DATA GETTING
+
+So far we've just passed a single hashref to the template when we express it, but we can get fancier than that.
+
+=head2 Register a data getter
+
+You can register a data getter ahead of time so text retrieval will always produce an updated value.
+
+    use Data::Org::Template;
+
+    my $data = {name => 'world'};
+
+    my $t = Data::Org::Template->new ("Hello, {name}!", '{}');
+    $t->data_getter ($data);
+    
+    print $t->text; # --> Hello, world!
+    
+    $data->{name} = 'Bob';
+    print $t->text; # --> Hello, Bob!
+
+=head2 Getting data from multiple sources
+
+All the getters we've used so far have had a single source - one hashref holding values. But in reality, a getter can accept a list of sources.
+The getter will consult each source in turn until it gets a defined value.
+
+    use Data::Org::Template;
+
+    my $t = Data::Org::Template->new ("Hello, [[name]]!");
+    $t->data_getter({}, {});
+
+
+ Other things to put in a cookbook:
  - Retrieving values with a formatter
  - Registering your own formatter
 

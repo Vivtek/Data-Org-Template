@@ -16,6 +16,14 @@ $t = Data::Org::Template->new("Hello, [[name]]!");
 $t->data_getter ({name => 'world'});
 is ($t->text(), 'Hello, world!', 'basic template expression');
 
+$t = Data::Org::Template->new("Hello, [[name]]!");
+is ($t->text({name => 'world'}), 'Hello, world!', 'values at expression time');
+
+$t = Data::Org::Template->new("Hello, {name}!", '{}');
+is ($t->text({name => 'world'}), 'Hello, world!', 'values at expression time');
+
+
+
 
 # Let's do an IF!
 $t = Data::Org::Template->new (<<EOF);

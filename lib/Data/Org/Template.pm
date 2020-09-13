@@ -238,9 +238,13 @@ If no data getter is specified, uses the one registered in the template. If none
 
 sub iter {
    my $self = shift;
-   my $data_getter = shift;
-   $data_getter = $self->{data} unless defined $data_getter;
-   croak "No data getter specified" unless defined $data_getter;
+   
+   my $context = undef;
+   if (scalar @_) {
+      $context = [@_];
+   }
+   my $data_getter = $self->{data};
+   $data_getter = Data::Org::Template::Getter->new ({}) unless defined $data_getter;
 
    if (not defined $self->{transducer}) {  # Here, do some error checking once we have a transducer scan working.
       $self->{transducer} = {
@@ -262,7 +266,7 @@ sub iter {
    }
 
    
-   _express_template ($self->{template}, $data_getter, undef, 0, $self->{transducer});
+   _express_template ($self->{template}, $data_getter, $context, 0, $self->{transducer});
 }
 
 sub _express_template {
