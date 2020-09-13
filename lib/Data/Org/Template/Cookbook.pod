@@ -1,0 +1,51 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Org::Template::Cookbook - Simple recipes for my flavor of templates
+
+=head1 DESCRIPTION
+
+I have no memory whatsoever for syntactic detail, which is a significant handicap for a programmer. As a result, I rely on cookbooks, notes, and code snippets to
+do the most trivial of things - I can only whip out code quickly when it's entirely non-trivial, like tossing closures around.
+
+This set of examples is therefore really more for my own use than yours, but I hope you find it useful as well.
+
+=head1 BASIC TEMPLATING
+
+=head2 Hello, world
+
+The most fundamental programming task, as we all know, is to greet the entire human race. Here's how you'd do that using a DOTemplate - and of course by changing the
+input data you can greet anybody you like.
+
+    use Data::Org::Template;
+
+    my $t = Data::Org::Template->new ("Hello, [[world]]!");
+    
+    print $t->text({name => 'world'});
+
+So far, this is no different from any other template engine - we have a field delimited by some kind of special brackets, and the field names a data item in a hashref.
+This is just how you set it all up.
+
+ Other things to put in a cookbook:
+ - Multiline templates (<<'EOF' syntax)
+ - Parsing on different brackets
+ - Setting the getter for the template
+ - Defining different types of getter, including multi-source getters 
+
+ - Retrieving values with a formatter
+ - Registering your own formatter
+
+ - Building templates directly (handing it the token stream)
+
+ - Conditionals
+ - "With" for hashrefs within hashrefs
+
+ - List templates
+ - Specific Iterator::Records expression
+
+ - Reading the template as a stream
+ - Adding your own transducers
+
