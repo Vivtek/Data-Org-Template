@@ -438,6 +438,10 @@ sub get {
    ($what, @formatters) = $self->{format}->($what);
    
    my $value = $self->_get($what, $context);
+   while (defined $value and ref ($value) eq 'CODE') {
+      $value = $value->();
+   }
+   
    foreach my $f (@formatters) {
       $value = $f->($value);
    }
