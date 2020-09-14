@@ -77,9 +77,96 @@ The getter will consult each source in turn until it gets a defined value.
 
     use Data::Org::Template;
 
-    my $t = Data::Org::Template->new ("Hello, [[name]]!");
-    $t->data_getter({}, {});
+    my $t = Data::Org::Template->new ("First [[x]] then [[y]]");
+    my $data = {x => 'xval'};
+    $t->data_getter($data, {y=>'yval'});
+    
+    print $t->text; # --> First xval then yval
+    
+    $data->{yval} = 'not yval';
+    print $t->text; # --> First xval then not yval
 
+Notice that the value for C<y> in the first hash now shadows the value in the second hash.
+
+=head2 Special cases in multiple-source retrieval
+
+There are two special cases that can come in handy. The first is that if there is a "source" in the list that is a scalar value, then it can be retrieved with the
+special field name of "." - a period.
+
+    use Data::Org::Template;
+
+    my $t = Data::Org::Template->new ("Value: [[.]]");
+    
+    print $t->text ('value'); # --> Value: value
+    
+The second comes into play when a data source list is passed to a template that already has a registered data getter. The getter is only consulted for values if
+the special source "*" has been included in the list passed to expression. That explanation isn't all that clear, but the code probably makes it obvious:
+
+    use Data::Org::Template;
+
+    my $t = Data::Org::Template->new ("First [[x]] then [[y]]");
+    my $data = {x => 'xval'};
+    $t->data_getter($data);
+    
+    print $t->text ({y => 'yval'});      # --> First  then yval
+    print $t->text ({y => 'yval'}, '*'); # --> First xval then yval
+    print $t->text ({y => 'yval', x => 'not xval'}, '*'); # --> First not xval then yval
+    print $t->text ('*', {y => 'yval', x => 'not xval'}); # --> First xval then yval
+    
+The sources are still consulted in the order they're provided, so in the final print statement the template's own getter returns a value for C<x> before the value
+passed in for expression.
+
+=head2 Magic values
+
+Any value returned by a data getter can also be a coderef (a closure) - if so, it is executed to get the final value. (If the return value is still a coderef, it
+will be executed again. And again. Try not to shoot yourself in the foot with a self-returning coderef, obviously.) This is a kind of neat way to embed a template
+in another template - just make the embedded template's expression a magic value in the data for the second template.
+
+    use Data::Org::Template;
+
+    my $data = {name => 'world'};
+    $t = Data::Org::Template->new("Hello, [[name]]!");
+    $t->data_getter ($data);
+
+    my $t2 = Data::Org::Template->new ("Current greeting: '[[greeting]]'");
+    $t2->data_getter ({greeting => sub { $t->text }});
+
+    print $t2->text();  # --> Current greeting: 'Hello, world!'
+    $data->{name} = 'Bob';
+    print $t2->text();  # --> Current greeting: 'Hello, Bob!'
+
+Personally, I think that's pretty darn cool.
+
+=head2 Indentation preservation
+
+One feature I actually wrote this library to provide is preservation of indentation when multi-lined values are inserted into a template.
+
+    use Data::Org::Template;
+
+    my $text = <<'EOF';
+    This is a text
+    that consists
+    of multiple lines.
+    EOF
+    
+    my $t = Data::Org::Template->new (<<'EOF');
+    This is the value: [[text]]
+    And this is the line after it.
+    EOF
+    
+    print $t->text({text => $text});
+    # This is the value: This is a text
+    #                    that consists
+    #                    of multiple lines.
+    # And this is the line after it.
+    
+My original impetus for this idea was years ago, when I was dabbling with literate programming and realized that it I<didn't work> for Python because it was
+such a pain to insert values that needed their indentation preserved properly.
+
+
+    
+
+=format comment
 
  Other things to put in a cookbook:
  - Retrieving values with a formatter
