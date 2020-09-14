@@ -166,7 +166,7 @@ such a pain to insert values that needed their indentation preserved properly.
 
     
 
-=format comment
+=for comment
 
  Other things to put in a cookbook:
  - Retrieving values with a formatter
