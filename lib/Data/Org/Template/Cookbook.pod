@@ -163,18 +163,85 @@ One feature I actually wrote this library to provide is preservation of indentat
 My original impetus for this idea was years ago, when I was dabbling with literate programming and realized that it I<didn't work> for Python because it was
 such a pain to insert values that needed their indentation preserved properly.
 
+=head1 FORMATTING VALUES
 
+=head2 HTML-encoding values
+
+There's actually an optional step in between retrieving a value from the getter and incorporating it into the template expression, and that's formatting.
+A really common formatter is HTML encoding, which substitutes HTML entities for the special values &, <, and >. This is so common it's the only formatter
+I've already implemented standard in the module, and this is how you use it:
+
+    use Data::Org::Template;
+
+    $t = Data::Org::Template->new("<i>[[string|html]]</i>");
+    print $t->text({string => '<x>'}); # --> <i>&lt;x&gt;</i>
     
+Anything after a vertical bar is a formatter, and you can run the value through an arbitrary number of formatters. Spaces around the bar are ignored.
+The formatter specification can also include spaces and some punctuation; the initial alphanumeric string identifies the formatter for lookup, but the
+whole string is passed to the formatter factory to parameterize the formatter instance. (This part isn't well-tested, so it might break if you actually
+use it; I just like leaving doors open for later use if the need arises.)
+
+=head2 Registering your own formatter
+
+Since the formatter represents arbitrary code that can modify the value as it comes from the data source, there are lots of things you can do with it,
+but since I haven't anticipated all possible (or even obvious) needs, you can also register your own formatters. The formatter factory is created when
+the data getter is created, so to do a custom formatter, you'll want something like this:
+
+    use Data::Org::Template;
+
+    my $t = Data::Org::Template->new("Hello, [[name | myfmt]]!");
+    my $getter = $t->data_getter ({});
+    $getter->formatter->register ('myfmt', sub { sub { return '...' . $_[0] . '...' } } );
+
+    print $t->text ({name => "Bob"}); # --> Hello, ...Bob...!
+    
+=head1 FANCY STUFF
+
+Up to this point, all we've done is get values and put them into vanilla templates. We can also use section directives to direct entire sections of the
+template; three are defined (but of course you can register your own - if you want to read the code; eventually, if the need arises, I'll work out how
+it works, fix any bugs I find, and document it here, but today is not that day). The three available are C<[[.if]]>, C<[[.with]]>, and C<[[.list]]>.
+All section directives are terminated with C<[[..]]> and they can have subsection directives of the form C<[[..else]]>.
+
+=head2 Conditional templates
+
+The .if directive is probably the most obvious to use. It checks a value, and includes its content if the value is true. If it contains an C<[[..else]]>
+subsection, that will be displayed if the value is false. Easy, right?
+
+    use Data::Org::Template;
+
+    my $data = {flag => 1};
+    my $t = Data::Org::Template->new("Current value: [[.if flag]]yes[[..else]]no[[..]]");
+
+    print $t->text; # --> Current value: yes
+    $data->{flag} = 0;
+    print $t->text; # --> Current value: no
+    
+If directives appear on their own line in a multi-line template, then the line end is considered part of the directive when replacing.
+
+    use Data::Org::Template;
+
+    my $data = {flag => 1};
+    my $t = Data::Org::Template->new(<<'EOF');
+    Current value:
+      [[.if flag]]
+      yes
+      [[..else]]
+      no
+      [[..]]
+    EOF
+
+    print $t->text ({flag => 0});
+    # Current value:
+    #   no
+
+(This is because I spent too much time agonizing over early template engines that would leave all kinds of blank lines everywhere in the output.)    
 
 =for comment
  Other things to put in a cookbook:
- - Retrieving values with a formatter
- - Registering your own formatter
- - Building templates directly (handing it the token stream)
- - Conditionals
  - "With" for hashrefs within hashrefs
  - List templates
  - Specific Iterator::Records expression
+ - Building templates directly (handing it the token stream)
  - Reading the template as a stream
  - Adding your own transducers
 
