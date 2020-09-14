@@ -325,6 +325,13 @@ This is a ubiquitous use case.
 Simple. Easy to remember. You could write a generic table displayer that would read the iterator's field list and use the actual field names
 as column headers; eventually I'm going to write that as part of a general SQL-to-HTML toolset.
 
+=head1 YOUR TURN
+
+That's all the recipes I'm going to write at the moment. I've already spent more time on writing this cookbook than I really intended. A couple of the examples aren't tested
+all that well, so if I use them in something and it turns out they were wrong, I'll update. If I<you> use this module, and have some convenient use cases you'd like to see
+here, by all means get in touch.
+
+
 =for comment
  Things that might be nice to put into this cookbook later:
  - Building templates directly (handing it the token stream)
