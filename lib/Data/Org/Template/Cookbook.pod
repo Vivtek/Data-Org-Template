@@ -167,19 +167,14 @@ such a pain to insert values that needed their indentation preserved properly.
     
 
 =for comment
-
  Other things to put in a cookbook:
  - Retrieving values with a formatter
  - Registering your own formatter
-
  - Building templates directly (handing it the token stream)
-
  - Conditionals
  - "With" for hashrefs within hashrefs
-
  - List templates
  - Specific Iterator::Records expression
-
  - Reading the template as a stream
  - Adding your own transducers
 
