@@ -20,8 +20,17 @@ WriteMakefile(
         'Data::Dumper' => 0,
     },
     PREREQ_PM => {
-        #'ABC'              => 1.6,
-        #'Foo::Bar::Module' => 5.0401,
+        #'Iterator::Records' => 0,
+    },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+               type => 'git',
+               url  => 'https://github.com/Vivtek/Data-Org-Template.git',
+               web  => 'https://github.com/Vivtek/Data-Org-Template',
+            },
+        },
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Data-Org-Template-*' },
