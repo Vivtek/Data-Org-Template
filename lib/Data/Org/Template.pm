@@ -14,7 +14,7 @@ Data::Org::Template - template engine that plays well with iterators
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
@@ -498,7 +498,7 @@ sub get_iterated {
    }
    # If a hash, iterate over the hash as a single child frame.
    if ($r eq 'HASH') { # -> new subcontext is an iterator that will return a single subframe
-      return unless scalar keys ($src); # An empty hash is equivalent to no data found
+      return unless scalar keys (%$src); # An empty hash is equivalent to no data found
       my $done = 0;
       return sub {
          return undef if $done;
