@@ -18,7 +18,7 @@ Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head1 SYNOPSIS
@@ -209,8 +209,12 @@ Sets or gets the current data getter for the template.
 
 sub data_getter {
    my $self = shift;
-   my $getter = shift;
-   $self->{data} = Data::Org::Template::Getter->new ($getter) if defined $getter;
+   return $self->{data} unless @_;
+   if (scalar @_ eq 1) {
+      $self->{data} = Data::Org::Template::Getter->new ($_[0]);
+   } else {
+      $self->{data} = Data::Org::Template::Getter->new ([@_]);
+   }
    $self->{data};
 }
 
