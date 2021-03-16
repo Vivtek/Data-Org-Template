@@ -72,7 +72,10 @@ sub _parse_template {
       my $piece = shift(@pieces);
       my ($type, $what) = @$piece;
       if ($type) {
-         if ($what =~ /^\./) { # 2018-09-08 section/subsection tag
+         if ($what eq '.' or $what =~ /^\.\|/) {
+            push @$template, ['?', $what];
+         }
+         elsif ($what =~ /^\./) { # 2018-09-08 section/subsection tag
             $swallow_nl = 1;
             if ($what eq '..') { # section end
                shift @stack if ($stack[0]->[0]); # Pop top of stack if it's a subsection.
